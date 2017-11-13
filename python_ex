@@ -1,0 +1,158 @@
+1,	input()返回的数据类型是str，str不能直接和整数比较，必须先把str转换成整数。Python提供了int()函数来完成这件事情：
+2,	set可以看成数学意义上的无序和无重复元素的集合，因此，两个set可以做数学意义上的交集、并集等操作
+	>>> s1 = set([1, 2, 3])
+	>>> s2 = set([2, 3, 4])
+	>>> s1 & s2
+	{2, 3}
+	>>> s1 | s2
+	{1, 2, 3, 4}
+	通过add(key)方法可以添加元素到set中，可以重复添加，但不会有效果：
+
+	>>> s.add(4)
+	>>> s
+	{1, 2, 3, 4}
+	>>> s.add(4)
+	>>> s
+	{1, 2, 3, 4}
+
+	通过remove(key)方法可以删除元素：
+
+	>>> s.remove(4)
+	>>> s
+	{1, 2, 3}
+3,先定义一个函数，传入一个list，添加一个END再返回：
+
+	def add_end(L=[]):
+	    L.append('END')
+	    return L
+
+	当你正常调用时，结果似乎不错：
+
+	>>> add_end([1, 2, 3])
+	[1, 2, 3, 'END']
+	>>> add_end(['x', 'y', 'z'])
+	['x', 'y', 'z', 'END']
+
+4,先定义一个函数，传入一个list，添加一个END再返回：
+
+	def add_end(L=[]):
+	    L.append('END')
+	    return L
+
+	当你正常调用时，结果似乎不错：
+
+	>>> add_end([1, 2, 3])
+	[1, 2, 3, 'END']
+	>>> add_end(['x', 'y', 'z'])
+	['x', 'y', 'z', 'END']
+5,Python的函数具有非常灵活的参数形态，既可以实现简单的调用，又可以传入非常复杂的参数。
+
+默认参数一定要用不可变对象，如果是可变对象，程序运行时会有逻辑错误！
+
+要注意定义可变参数和关键字参数的语法：
+
+*args是可变参数，args接收的是一个tuple；
+
+**kw是关键字参数，kw接收的是一个dict。
+
+以及调用函数时如何传入可变参数和关键字参数的语法：
+
+可变参数既可以直接传入：func(1, 2, 3)，又可以先组装list或tuple，再通过*args传入：func(*(1, 2, 3))；
+
+关键字参数既可以直接传入：func(a=1, b=2)，又可以先组装dict，再通过**kw传入：func(**{'a': 1, 'b': 2})。
+
+使用*args和**kw是Python的习惯写法，当然也可以用其他参数名，但最好使用习惯用法。
+
+命名的关键字参数是为了限制调用者可以传入的参数名，同时可以提供默认值。
+
+定义命名的关键字参数在没有可变参数的情况下不要忘了写分隔符*，否则定义的将是位置参数。
+6,如果要对list实现类似Java那样的下标循环怎么办？Python内置的enumerate函数可以把一个list变成索引-元素对，这样就可以在for循环中同时迭代索引和元素本身：
+
+>>> for i, value in enumerate(['A', 'B', 'C']):
+...     print(i, value)
+...
+0 A
+1 B
+2 C
+7,reduce的用法。reduce把一个函数作用在一个序列[x1, x2, x3, ...]上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算，其效果就是：
+
+reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)
+8,我们先看map。map()函数接收两个参数，一个是函数，一个是Iterable，map将传入的函数依次作用到序列的每个元素，并把结果作为新的Iterator返回。
+9,通过对比可以看出，匿名函数lambda x: x * x实际上就是：
+
+def f(x):
+    return x * x
+
+关键字lambda表示匿名函数，冒号前面的x表示函数参数。
+
+10,def log(text):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            print('%s %s():' % (text, func.__name__))
+            return func(*args, **kw)
+        return wrapper
+    return decorator
+
+这个3层嵌套的decorator用法如下：
+
+@log('execute')
+def now():
+    print('2015-3-25')
+
+执行结果如下：
+
+>>> now()
+execute now():
+2015-3-25
+
+和两层嵌套的decorator相比，3层嵌套的效果是这样的：
+
+>>> now = log('execute')(now)
+
+11,functools.partial就是帮助我们创建一个偏函数的，不需要我们自己定义int2()，可以直接使用下面的代码创建一个新的函数int2：
+
+>>> import functools
+>>> int2 = functools.partial(int, base=2)
+>>> int2('1000000')
+64
+>>> int2('1010101')
+85
+
+所以，简单总结functools.partial的作用就是，把一个函数的某些参数给固定住（也就是设置默认值），返回一个新的函数，调用这个新函数会更简单。
+12,判断基本数据类型可以直接写int，str等，但如果要判断一个对象是否是函数怎么办？可以使用types模块中定义的常量：
+
+>>> import types
+>>> def fn():
+...     pass
+...
+>>> type(fn)==types.FunctionType
+True
+>>> type(abs)==types.BuiltinFunctionType
+True
+>>> type(lambda x: x)==types.LambdaType
+True
+>>> type((x for x in range(10)))==types.GeneratorType
+True
+
+
+13,使用dir()
+
+如果要获得一个对象的所有属性和方法，可以使用dir()函数，它返回一个包含字符串的list，比如，获得一个str对象的所有属性和方法
+14,类属性和对象属性
+>>> class Student(object):
+...     name = 'Student'
+...
+>>> s = Student() # 创建实例s
+>>> print(s.name) # 打印name属性，因为实例并没有name属性，所以会继续查找class的name属性
+Student
+>>> print(Student.name) # 打印类的name属性
+Student
+>>> s.name = 'Michael' # 给实例绑定name属性
+>>> print(s.name) # 由于实例属性优先级比类属性高，因此，它会屏蔽掉类的name属性
+Michael
+>>> print(Student.name) # 但是类属性并未消失，用Student.name仍然可以访问
+Student
+>>> del s.name # 如果删除实例的name属性
+>>> print(s.name) # 再次调用s.name，由于实例的name属性没有找到，类的name属性就显示出来了
+Student
+
